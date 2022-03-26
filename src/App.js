@@ -74,7 +74,12 @@ const App = () => {
   };
   const display = () => {
     const size = Object.keys(paths).length;
-    const matrice = Array(size).fill(Array(size).fill(0));
+    const matrice = Array(size).fill([]);
+    for (let index = 0; index < size; index++) {
+      const tab = Array(size).fill(0);
+      matrice[index] = tab;
+    }
+
     let i = 0;
     for (const val of Object.values(paths)) {
       const keys = Object.keys(val).filter((v) => v !== "text");
