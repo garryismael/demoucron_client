@@ -81,10 +81,11 @@ const App = () => {
       let j = i + 1;
       for (const key of keys) {
         const distance = val[key].distance;
-        matrice[i][j] = distance;
+        matrice[i][j] = parseInt(distance);
         ++j;
       }
     }
+    console.log(matrice);
   };
   return (
     <div>
