@@ -73,11 +73,19 @@ const App = () => {
     }
   };
   const display = () => {
-    // const matrice_carre = Object.keys(chemins).length;
-    // const matrice = Array(matrice_carre).fill(Array(matrice_carre).fill(0));
-    console.log(paths);
+    const size = Object.keys(paths).length;
+    const matrice = Array(size).fill(Array(size).fill(0));
+    let i = 0;
+    for (const val of Object.values(paths)) {
+      const keys = Object.keys(val).filter((v) => v !== "text");
+      let j = i + 1;
+      for (const key of keys) {
+        const distance = val[key].distance;
+        matrice[i][j] = distance;
+        ++j;
+      }
+    }
   };
-
   return (
     <div>
       <Error />
