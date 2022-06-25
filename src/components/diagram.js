@@ -4,7 +4,7 @@ import initDiagram from "../utils/diagram";
 
 const Diagram = ({ update }) => {
   return (
-    <div className="col">
+    <div className="w-5/6">
       <ReactDiagram
         initDiagram={initDiagram}
         divClassName="gojs-component"

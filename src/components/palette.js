@@ -3,7 +3,7 @@ import initPalette from "../utils/palette";
 
 const Palette = () => {
   return (
-    <div className="col-2">
+    <div className="w-1/6">
       <ReactDiagram
         initDiagram={initPalette}
         divClassName="gojs-component"
