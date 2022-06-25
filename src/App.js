@@ -1,5 +1,4 @@
 import "./App.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Diagram from "./components/diagram";
 import Palette from "./components/palette";
 import Error from "./components/errors";
