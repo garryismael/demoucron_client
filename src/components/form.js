@@ -6,7 +6,7 @@ const Form = ({ onClick, nodes }) => {
 	const [start, setStart] = useState('');
 	const [arrival, setArrival] = useState('');
 
-	const choices = { 1: { text: 'Min' }, 2: { text: 'Max' } };
+	const choices = { 'min': { text: 'Min' }, 'max': { text: 'Max' } };
 
 	const submit = (e) => {
 		e.preventDefault();

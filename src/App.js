@@ -3,12 +3,22 @@ import Diagram from './components/diagram';
 import Palette from './components/palette';
 import useDiagram from './hooks/useDiagram';
 import Form from './components/form';
+import Matrice from './utils/matrice';
+import axios from 'axios';
+
+const URI = 'http://127.0.0.1:8000';
 
 const App = () => {
 	const [paths, nodes, update] = useDiagram();
 
-	const showPath = ({ choice, start, arrival }) => {
-		console.log(paths);
+	const showPath = async ({ choice, start, arrival }) => {
+		const default_value = choice === 'min' ? null : 0;
+		const m = new Matrice(paths, String(start), String(arrival), default_value);
+		const url = `${URI}/${choice}`;
+		const response = await axios.post(url, {
+			matrice: m.matrice,
+		});
+		console.log(response.data);
 	};
 	return (
 		<>

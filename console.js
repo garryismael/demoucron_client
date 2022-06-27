@@ -6,15 +6,15 @@ const data = {
             distance: '3',
             text: 'X2',
         },
-        '-2': {
-            to: -3,
-            distance: '8',
-            text: 'X3',
-        },
         '-3': {
             to: -4,
             distance: '6',
             text: 'X4',
+        },
+        '-2': {
+            to: -3,
+            distance: '8',
+            text: 'X3',
         },
     },
     '-2': {
@@ -65,63 +65,77 @@ const data = {
 };
 
 class Matrice {
-    constructor(data, depart, arrivee) {
-        this.data = data;
-        this.keys = Object.keys(data);
+    constructor(nodes, depart, arrivee, default_value) {
+        this.nodes = nodes;
         this.depart = depart;
         this.arrivee = arrivee;
-        this.init();
+        this.ordres = [];
+        this.init(default_value);
+        this.ordres_noeud();
+        this.generer();
     }
 
-    init() {
-        this.matrice = this.keys.map((_) => new Array(this.keys.length).fill(0));
+    init(default_value) {
+        const keys = Object.keys(this.nodes);
+        this.matrice = keys.map((_) => new Array(keys.length).fill(default_value));
     }
 
-    generate() {
-        const ordres = [String(this.depart)];
-        let enCours = this.point_de_depart(this.depart, this.data, ordres);
-        let size = enCours.length;
-        let i = 0, j = 0;
-        while (size > 0) {
-            const key = String(enCours.shift());
-            if (!ordres.includes(key)) {
-                ordres.push(key);
-                const node = this.data[key];
-                enCours = enCours.concat(this.point_de_depart(key, { [String(key)]: node }, ordres));
-            }
-            size = enCours.length;
-        }
-
-        for (const key of ordres) {
-            const node = this.data[key];
-            for (const k of Object.keys(node).filter(v => v !== 'text')) {
-                j = this.emplacement(ordres, String(node[k].to)); 
-                if (j > -1) {
-                    const distance = parseInt(node[k].distance);
-                    this.matrice[i][j] = distance;
-                }
-            }
-            i += 1;
-        }
-    }
-
-    emplacement(ordres, to) {
-        return ordres.indexOf(to);
-    }
-
-    point_de_depart(depart, data, ordres) {
+    destinations(depart, nodes, ordres) {
         let points = [];
-        for (const key of Object.keys(data[String(depart)]).filter(v => v !== 'text')) {
-            let point = parseInt(data[String(depart)][key].to);
+        for (const key of Object.keys(nodes[depart]).filter((v) => v !== 'text')) {
+            let point = parseInt(nodes[depart][key].to);
             if (!ordres.includes(point) || point !== this.arrivee) {
                 points.push(String(point));
             }
         }
         return points;
     }
+
+    ordres_noeud() {
+        const ordres = [this.depart];
+        let en_cours = this.destinations(this.depart, this.nodes, ordres);
+        let taille = en_cours.length;
+        while (taille > 0) {
+            const cle = en_cours.shift();
+            if (!ordres.includes(cle)) {
+                ordres.push(cle);
+                const node = this.nodes[cle];
+                en_cours = en_cours.concat(
+                    this.destinations(cle, { [String(cle)]: node }, ordres)
+                );
+            }
+            taille = en_cours.length;
+        }
+        this.ordres = ordres;
+    }
+
+    liens() {
+        return Object.values(this.nodes).map(value => {
+            let link = Object.assign({}, value);
+            delete link['text'];
+            return link;
+        });
+    }
+
+    generer() {
+        const keys = Object.keys(this.nodes);
+        const links = this.liens();
+        let i = 0, j = 0;
+        for (const link of links) {
+            for (const val of Object.values(link)) {
+                const to = String(val.to);
+                const distance = val.distance;
+                j = keys.indexOf(to);
+                this.matrice[i][j] = distance;
+            }
+            i++;
+        }
+    }
 }
 
-const matrice = new Matrice(data, 0, -6);
-matrice.generate();
+
+const matrice = new Matrice(data, '0', '-6', 0);
+
+matrice.generer();
 
 console.log(matrice.matrice)

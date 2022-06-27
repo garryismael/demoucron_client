@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Path, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from api.demoucron import Demoucron
 from api.constants import (
@@ -6,11 +7,22 @@ from api.constants import (
     INVALID_MATRIX_VALUE
 )
 
+data = [
+    [0, 1, 1],
+    [0, 2, 1]    
+]
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["POST"],
+    allow_headers=["*"],
+)
 
 class Matrice(BaseModel):
-    matrice: list[list]
+    matrice: list[list[int | None]]
 
     @staticmethod
     def is_valid_matrice(matrice, choice):
@@ -31,7 +43,6 @@ class Matrice(BaseModel):
 
 @app.post("/{choice}")
 def api(data: Matrice, choice: str = Path(..., regex="^(min|max)$")):
-    print("OK")
     comparer_elem = None
     comparer_vecteur = min
     result = []

@@ -1,23 +1,22 @@
 export default class Matrice {
-    constructor(nodes, depart, arrivee) {
+    constructor(nodes, depart, arrivee, default_value) {
         this.nodes = nodes;
         this.depart = depart;
         this.arrivee = arrivee;
         this.ordres = [];
-        this.init();
+        this.init(default_value);
         this.ordres_noeud();
+        this.generer();
     }
 
-    init() {
+    init(default_value) {
         const keys = Object.keys(this.nodes);
-        this.matrice = keys.map((_) => new Array(keys.length).fill(0));
+        this.matrice = keys.map((_) => new Array(keys.length).fill(default_value));
     }
 
     destinations(depart, nodes, ordres) {
         let points = [];
-        for (const key of Object.keys(nodes[depart]).filter(
-            (v) => v !== 'text'
-        )) {
+        for (const key of Object.keys(nodes[depart]).filter((v) => v !== 'text')) {
             let point = parseInt(nodes[depart][key].to);
             if (!ordres.includes(point) || point !== this.arrivee) {
                 points.push(String(point));
@@ -44,19 +43,26 @@ export default class Matrice {
         this.ordres = ordres;
     }
 
+    liens() {
+        return Object.values(this.nodes).map(value => {
+            let link = Object.assign({}, value);
+            delete link['text'];
+            return link;
+        });
+    }
+
     generer() {
-        let i = 0,
-            j = 0;
-        for (const key of this.ordres) {
-            const node = this.nodes[key];
-            for (const k of Object.keys(node).filter((v) => v !== 'text')) {
-                j = this.ordres.indexOf(String(node[k].to));
-                if (j > -1) {
-                    const distance = parseInt(node[k].distance);
-                    this.matrice[i][j] = distance;
-                }
+        const keys = Object.keys(this.nodes);
+        const links = this.liens();
+        let i = 0, j = 0;
+        for (const link of links) {
+            for (const val of Object.values(link)) {
+                const to = String(val.to);
+                const distance = val.distance;
+                j = keys.indexOf(to);
+                this.matrice[i][j] = distance;
             }
-            i += 1;
+            i++;
         }
     }
 }
