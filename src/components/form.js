@@ -1,35 +1,65 @@
 import { useState } from 'react';
+import SelectField from './select';
 
-const Form = (props) => {
-	const [debuts, setDebuts] = useState([]);
-	const [ends, setEnds] = useState([]);
-  
+const Form = ({ onClick, nodes }) => {
+	const [choice, setChoice] = useState('min');
+	const [start, setStart] = useState('');
+	const [arrival, setArrival] = useState('');
+
+	const choices = { 1: { text: 'Min' }, 2: { text: 'Max' } };
+
 	const submit = (e) => {
 		e.preventDefault();
-		props.onClick();
+		onClick({ choice, start, arrival });
 	};
+
+	const onSelectChoice = (e) => {
+		setChoice(e.target.value);
+	};
+
+	const onSelectStart = (e) => {
+		setStart(e.target.value);
+	};
+
+	const onSelectArrival = (e) => {
+		setArrival(e.target.value);
+	};
+
+	const selects = [
+		{
+			name: 'Choice',
+			label: 'Choice',
+			onSelect: onSelectChoice,
+			nodes: choices,
+		},
+		{
+			name: 'depart',
+			label: 'Départ',
+			onSelect: onSelectStart,
+			nodes,
+		},
+		{
+			name: 'arrive',
+			label: 'Arrivée',
+			onSelect: onSelectArrival,
+			nodes,
+		},
+	];
 	return (
 		<form
 			onSubmit={submit}
 			method='GET'
 			className='mr-2 flex flex-row gap-1 justify-end'
 		>
-			<select>
-      <option value=''>Debut</option>
-				{debuts.map((debut) => (
-					<option key={debut.key} value={debut.key}>
-						{debut.text}
-					</option>
-				))}
-			</select>
-			<select>
-      <option value=''>Fin</option>
-				{ends.map((end) => (
-					<option key={end.key} value={end.key}>
-						{end.text}
-					</option>
-				))}
-			</select>
+			{selects.map((value) => (
+				<SelectField
+					key={value.name}
+					name={value.name}
+					label={value.label}
+					nodes={value.nodes}
+					onSelect={value.onSelect}
+				/>
+			))}
 			<button
 				className='ui-button bg-blue-500 text-white pl-5 pr-5 pt-1 pb-1'
 				type='submit'

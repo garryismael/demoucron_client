@@ -1,25 +1,21 @@
 import './App.css';
 import Diagram from './components/diagram';
 import Palette from './components/palette';
-import pathReducer from './reducer/chemin';
-import nodeReducer from './reducer/node';
+import useDiagram from './hooks/useDiagram';
 import Form from './components/form';
-import { useReducer } from 'react';
-import changeDiagram from './utils/action';
 
 const App = () => {
-	const [paths, dispatchPath] = useReducer(pathReducer, {});
-  const [nodes, dispatchNodes] = useReducer(nodeReducer, {});
-	const update = (e) => {
-		changeDiagram(e, dispatchPath, dispatchNodes);
+	const [paths, nodes, update] = useDiagram();
+
+	const showPath = ({ choice, start, arrival }) => {
+		console.log(paths);
 	};
-  const showPath = () => {
-    console.log(paths);
-  }
 	return (
 		<>
-			<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 m-2 rounded relative">Error</div>
-			<Form onClick={showPath} selects={nodes}/>
+			<div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 m-2 rounded relative'>
+				Error
+			</div>
+			<Form onClick={showPath} nodes={nodes} />
 			<div className='flex'>
 				<Palette />
 				<Diagram update={update} />
