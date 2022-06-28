@@ -7,10 +7,6 @@ from api.constants import (
     INVALID_MATRIX_VALUE
 )
 
-data = [
-    [0, 1, 1],
-    [0, 2, 1]    
-]
 app = FastAPI()
 
 app.add_middleware(
@@ -46,9 +42,8 @@ def api(data: Matrice, choice: str = Path(..., regex="^(min|max)$")):
     comparer_elem = None
     comparer_vecteur = min
     result = []
-
     valid = Matrice.is_valid_matrice(data.matrice, choice)
-    if valid != None:
+    if valid is not None:
         raise HTTPException(status_code=400, detail=valid)
 
     if choice == "min":
@@ -57,6 +52,8 @@ def api(data: Matrice, choice: str = Path(..., regex="^(min|max)$")):
         def comparer_elem(a): return a > 0
         comparer_vecteur = max
     demoucron = Demoucron(data.matrice, comparer_elem, comparer_vecteur)
-    result = demoucron.trouver_chemin_min(
-    ) if choice == "min" else demoucron.trouver_chemin_max()
-    return {"resultat": result}
+    
+    if choice == 'min':
+        return {'resultat': demoucron.trouver_chemin_min()}
+    else:
+        return {'resultat': demoucron.trouver_chemin_max()}
