@@ -1,54 +1,50 @@
-from typing import Callable
+import numpy as np
 from api.list_entete import Stack
 
 
 class Demoucron:
-    def __init__(
-        self,
-        matrice: list[list: int],
-        comparer_elem: Callable[[int], bool],
-        comparer_vecteur: Callable[[int, int], int]
-    ):
+    def __init__(self, matrice: np.int64, choix: str):
         self.matrice = matrice
-        self.sommets = len(matrice)
-        self.calcul(comparer_elem, comparer_vecteur)
 
-    def calcul(
-        self,
-        comparer_elem: Callable[[int], bool],
-        comparer_vecteur: Callable[[int, int], int]
-    ):
+        self.comparer_elem = (lambda a: a is not None) if choix == 'min' else (lambda a: a > 0)
+        self.comparer_vecteur = min if choix == 'min' else max
+        self.calcul()
+
+    @property
+    def sommets(self):
+        return self.matrice.shape[0]
+
+    def calcul(self):
         k = 1
-        while k < self.sommets-1:
+        sommets = self.sommets
+        while k < sommets:
             entrees = []
             sorties = []
-            self.entrees_point(k, entrees, comparer_elem)
-            self.sorties_point(k, sorties, comparer_elem)
+            self.entrer(k, entrees)
+            self.sortir(k, sorties)
             for entree in entrees:
-                a = self.matrice[entree][k]
+                a = self.matrice[entree, k]
                 if a:
                     for sortie in sorties:
-                        b = self.matrice[k][sortie]
-                        vector = self.matrice[entree][sortie]
-                        if vector:
-                            value = comparer_vecteur(
-                                [a+b, self.matrice[entree][sortie]])
-                        else:
-                            value = a+b
-                        self.matrice[entree][sortie] = value
+                        b = self.matrice[k, sortie]
+                        vecteur = self.matrice[entree, sortie]
+                        valeur = a + \
+                            b if not vecteur else self.comparer_vecteur(
+                                [a + b, vecteur])
+                        self.matrice[entree, sortie] = valeur
             k += 1
 
-    def entrees_point(self, k, entrees: list, factory: Callable[[int], bool]):
+    def entrer(self, k, entrees: list) -> list[int]:
         i = 0
         for tab in self.matrice:
-            if factory(tab[k]):
+            if self.comparer_elem(tab[k]):
                 entrees.append(i)
             i += 1
 
-    def sorties_point(self, k, sorties: list, factory: Callable[[int], bool]):
+    def sortir(self, k, sorties: list):
         i = 0
         for item in self.matrice[k]:
-            if factory(item):
+            if self.comparer_elem(item):
                 sorties.append(i)
             i += 1
 
@@ -59,7 +55,7 @@ class Demoucron:
         while colonne > 0:
             i = 0
             predecesseur = 0
-            min_val = self.matrice[predecesseur][colonne]
+            min_val = self.matrice[predecesseur, colonne]
             for tab in self.matrice:
                 value = tab[colonne]
                 if value and value < min_val:
@@ -78,7 +74,7 @@ class Demoucron:
         chemin = [ligne+1]
         while ligne < self.sommets - 1:
             i = 0
-            min_value = self.matrice[ligne][i]
+            min_value = self.matrice[ligne, i]
             for item in self.matrice[ligne]:
                 if min_value > 0 and item > 0:
                     if item < min_value:

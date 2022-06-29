@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Path, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
 from pydantic import BaseModel
 from api.demoucron import Demoucron
 from api.constants import (
@@ -16,6 +17,7 @@ app.add_middleware(
     allow_methods=["POST"],
     allow_headers=["*"],
 )
+
 
 class Matrice(BaseModel):
     matrice: list[list[int | None]]
@@ -39,21 +41,9 @@ class Matrice(BaseModel):
 
 @app.post("/{choice}")
 def api(data: Matrice, choice: str = Path(..., regex="^(min|max)$")):
-    comparer_elem = None
-    comparer_vecteur = min
-    result = []
     valid = Matrice.is_valid_matrice(data.matrice, choice)
     if valid is not None:
         raise HTTPException(status_code=400, detail=valid)
 
-    if choice == "min":
-        def comparer_elem(a): return a is not None
-    else:
-        def comparer_elem(a): return a > 0
-        comparer_vecteur = max
-    demoucron = Demoucron(data.matrice, comparer_elem, comparer_vecteur)
-    
-    if choice == 'min':
-        return {'resultat': demoucron.trouver_chemin_min()}
-    else:
-        return {'resultat': demoucron.trouver_chemin_max()}
+    demoucron = Demoucron(np.array(data), choice)
+    return demoucron.trouver_chemin_min() if choice == 'min' else demoucron.trouver_chemin_max()
