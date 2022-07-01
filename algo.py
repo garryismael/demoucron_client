@@ -33,8 +33,7 @@ class Stack:
 
 
 class Demoucron:
-    def __init__(self, matrice: np.int64, choix: str
-                 ):
+    def __init__(self, matrice: np.int64, choix: str):
         self.matrice = matrice
 
         self.comparer_elem = (
@@ -119,6 +118,7 @@ class Demoucron:
             chemin.append(ligne+1)
         return chemin
 
+
 a = np.array([
     [None, 3, 8, 6, None, None],
     [None, None, None, 2, 6, None],
@@ -137,6 +137,31 @@ b = np.array([
     [0, 0, 0, 0, 0, 0]
 ])
 
+c = np.array([
+    [0, 3, 0, 5, 0, 0, 0],
+    [0, 0, 4, 2, 6, 0, 0],
+    [0, 0, 0, 0, 4, 0, 5],
+    [0, 0, 3, 0, 0, 7, 0],
+    [0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0],
+])
+
 d = Demoucron(b, 'max')
 print(d.trouver_chemin_max())
-print(d.matrice)
+
+mat = d.matrice
+val_max = mat.max()
+i = 0
+for m in mat:
+    j = 0
+    for s in m:
+        if s > 0:
+            mat[i][j] = val_max - s
+        else:
+            mat[i][j] = val_max
+        j += 1
+    i += 1
+
+mat = np.array(mat)
+print(mat)
