@@ -1,51 +1,29 @@
 import numpy as np
 
 
-class Node:
-    def __init__(self, data: int):
-        self.data: int = data
-        self.next: Node = None
-
-
-class Stack:
-    def __init__(self):
-        self.top: Node = None
-        self.size: int = 0
-
-    def push(self, data: int):
-        node = Node(data)
-        if self.top:
-            node.next = self.top
-            self.top = node
-        else:
-            self.top = node
-        self.size += 1
-
-    def pop(self):
-        if self.top:
-            data: int = self.top.data
-            if self.top.next:
-                self.top = self.top.next
-            else:
-                self.top = None
-            self.size -= 1
-            return data
-
-
 class Demoucron:
     def __init__(self, matrice: np.int64, choix: str):
-        self.matrice = matrice
-
-        self.comparer_elem = (
-            lambda a: a is not None) if choix == 'min' else (lambda a: a > 0)
+        self._matrice = matrice
+        self.comparer_elem = Demoucron.notNan if choix == 'min' else Demoucron.greater
         self.comparer_vecteur = min if choix == 'min' else max
-        self.calcul()
+        self.choix = choix
+        self.calculer()
 
-    @property
-    def sommets(self):
-        return self.matrice.shape[0]
+    def entrer(self, k, entrees: list):
+        i = 0
+        for tab in self._matrice:
+            if self.comparer_elem(tab[k]):
+                entrees.append(i)
+            i += 1
 
-    def calcul(self):
+    def sortir(self, k, sorties: list[int]):
+        i = 0
+        for item in self._matrice[k]:
+            if self.comparer_elem(item):
+                sorties.append(i)
+            i += 1
+
+    def calculer(self):
         k = 1
         sommets = self.sommets
         while k < sommets:
@@ -54,59 +32,41 @@ class Demoucron:
             self.entrer(k, entrees)
             self.sortir(k, sorties)
             for entree in entrees:
-                a = self.matrice[entree, k]
-                if a:
-                    for sortie in sorties:
-                        b = self.matrice[k, sortie]
-                        vecteur = self.matrice[entree, sortie]
-                        valeur = a + \
-                            b if not vecteur else self.comparer_vecteur(
-                                [a + b, vecteur])
-                        self.matrice[entree, sortie] = valeur
+                self.set_matrice(k, entree, sorties)
             k += 1
 
-    def entrer(self, k, entrees: list) -> list[int]:
-        i = 0
-        for tab in self.matrice:
-            if self.comparer_elem(tab[k]):
-                entrees.append(i)
-            i += 1
+    def set_matrice(self, k: int, entree: float, sorties: list[float]):
+        a = self._matrice[entree, k]
+        if not np.isnan(a):
+            for sortie in sorties:
+                b = self._matrice[k, sortie]
+                vecteur = self._matrice[entree, sortie]
+                self._matrice[entree, sortie] = self.valeur(vecteur, a, b)
 
-    def sortir(self, k, sorties: list):
-        i = 0
-        for item in self.matrice[k]:
-            if self.comparer_elem(item):
-                sorties.append(i)
-            i += 1
+    def valeur(self, vecteur: float, a: float, b: float):
+        if np.isnan(vecteur):
+            return a + b
+        return self.comparer_vecteur([a+b, vecteur])
 
-    def trouver_chemin_min(self):
-        colonne = self.sommets - 1
-        chemins = Stack()
-        chemins.push(self.sommets)
-        while colonne > 0:
-            i = 0
-            predecesseur = 0
-            min_val = self.matrice[predecesseur, colonne]
-            for tab in self.matrice:
-                value = tab[colonne]
-                if value and value < min_val:
-                    min_val = value
-                    predecesseur = i
-                i += 1
-            colonne = predecesseur
-            chemins.push(colonne+1)
-        result = []
-        while chemins.size > 0:
-            result.append(chemins.pop())
-        return result
+    @property
+    def minimiser(self):
+        line = self.sommets-1
+        paths: list[int] = []
+        paths.append(line)
+        while line > 0:
+            line = np.nanargmin(self._matrice[:, line])
+            paths.append(line)
+        paths.reverse()
+        return paths
 
-    def trouver_chemin_max(self):
+    @property
+    def maximiser(self):
         ligne = 0
         chemin = [ligne+1]
         while ligne < self.sommets - 1:
             i = 0
-            min_value = self.matrice[ligne, i]
-            for item in self.matrice[ligne]:
+            min_value = self._matrice[ligne, i]
+            for item in self._matrice[ligne]:
                 if min_value > 0 and item > 0:
                     if item < min_value:
                         min_value = item
@@ -118,6 +78,18 @@ class Demoucron:
             chemin.append(ligne+1)
         return chemin
 
+    @staticmethod
+    def notNan(a: np.float64):
+        return not np.isnan(a)
+
+    @staticmethod
+    def greater(a: np.float64):
+        return a > 0
+
+    @property
+    def sommets(self):
+        return self._matrice.shape[0]
+
 
 a = np.array([
     [None, 3, 8, 6, None, None],
@@ -126,7 +98,7 @@ a = np.array([
     [None, None, 2, None, None, 7],
     [None, None, None, None, None, 2],
     [None, None, None, None, None, None]
-])
+], dtype=np.float64)
 
 b = np.array([
     [0, 3, 8, 6, 0, 0],
@@ -147,21 +119,6 @@ c = np.array([
     [0, 0, 0, 0, 0, 0, 0],
 ])
 
-d = Demoucron(b, 'max')
-print(d.trouver_chemin_max())
-
-mat = d.matrice
-val_max = mat.max()
-i = 0
-for m in mat:
-    j = 0
-    for s in m:
-        if s > 0:
-            mat[i][j] = val_max - s
-        else:
-            mat[i][j] = val_max
-        j += 1
-    i += 1
-
-mat = np.array(mat)
-print(mat)
+d = Demoucron(a, 'min')
+print(d._matrice)
+print(d.minimiser)

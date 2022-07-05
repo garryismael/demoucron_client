@@ -1,5 +1,4 @@
 import numpy as np
-from api.list_entete import Stack
 
 
 class Demoucron:
@@ -50,8 +49,8 @@ class Demoucron:
 
     def trouver_chemin_min(self):
         colonne = self.sommets - 1
-        chemins = Stack()
-        chemins.push(self.sommets)
+        chemins = []
+        chemins.append(self.sommets)
         while colonne > 0:
             i = 0
             predecesseur = 0
@@ -63,11 +62,9 @@ class Demoucron:
                     predecesseur = i
                 i += 1
             colonne = predecesseur
-            chemins.push(colonne+1)
-        result = []
-        while chemins.size > 0:
-            result.append(chemins.pop())
-        return result
+            chemins.append(colonne+1)
+        chemins.reverse()
+        return chemins
 
     def trouver_chemin_max(self):
         ligne = 0
