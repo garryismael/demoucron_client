@@ -48,6 +48,7 @@ class Demoucron:
             return a + b
         return self.comparer_vecteur([a+b, vecteur])
 
+    @property
     def minimiser(self):
         line = self.sommets-1
         paths: list[int] = []
@@ -58,6 +59,7 @@ class Demoucron:
         paths.reverse()
         return paths
 
+    @property
     def maximiser(self):
         ligne = 0
         chemin = [ligne+1]
@@ -77,7 +79,7 @@ class Demoucron:
         return chemin
 
     def find_path(self) -> list[int]:
-        return getattr(self, self.choix)()
+        return getattr(self, self.choix)
 
     @staticmethod
     def notNan(a: np.float64):
