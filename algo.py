@@ -2,10 +2,10 @@ import numpy as np
 
 
 class Demoucron:
-    def __init__(self, matrice: np.int64, choix: str):
+    def __init__(self, matrice, choix: str):
         self._matrice = matrice
-        self.comparer_elem = Demoucron.notNan if choix == 'min' else Demoucron.greater
-        self.comparer_vecteur = min if choix == 'min' else max
+        self.comparer_elem = Demoucron.notNan if choix == 'minimiser' else Demoucron.greater
+        self.comparer_vecteur = min if choix == 'minimiser' else max
         self.choix = choix
         self.calculer()
 
@@ -54,7 +54,7 @@ class Demoucron:
         paths: list[int] = []
         paths.append(line)
         while line > 0:
-            line = np.nanargmin(self._matrice[:, line])
+            line: int = np.nanargmin(self._matrice[:, line])
             paths.append(line)
         paths.reverse()
         return paths
@@ -78,6 +78,9 @@ class Demoucron:
             chemin.append(ligne+1)
         return chemin
 
+    def find_path(self) -> list[int]:
+        return getattr(self, self.choix)
+
     @staticmethod
     def notNan(a: np.float64):
         return not np.isnan(a)
@@ -100,25 +103,7 @@ a = np.array([
     [None, None, None, None, None, None]
 ], dtype=np.float64)
 
-b = np.array([
-    [0, 3, 8, 6, 0, 0],
-    [0, 0, 0, 2, 6, 0],
-    [0, 0, 0, 0, 1, 0],
-    [0, 0, 2, 0, 0, 7],
-    [0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0]
-])
 
-c = np.array([
-    [0, 3, 0, 5, 0, 0, 0],
-    [0, 0, 4, 2, 6, 0, 0],
-    [0, 0, 0, 0, 4, 0, 5],
-    [0, 0, 3, 0, 0, 7, 0],
-    [0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 0],
-])
-
-d = Demoucron(a, 'min')
+d = Demoucron(a, 'minimiser')
 print(d._matrice)
-print(d.minimiser)
+print(d.find_path())

@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Demoucron:
-    def __init__(self, matrice: np.int64, choix: str):
+    def __init__(self, matrice: np.ndarray, choix: str):
         self._matrice = matrice
         self.comparer_elem = Demoucron.notNan if choix == 'minimiser' else Demoucron.greater
         self.comparer_vecteur = min if choix == 'minimiser' else max
@@ -48,18 +48,16 @@ class Demoucron:
             return a + b
         return self.comparer_vecteur([a+b, vecteur])
 
-    @property
     def minimiser(self):
         line = self.sommets-1
         paths: list[int] = []
         paths.append(line)
         while line > 0:
-            line: int = np.nanargmin(self._matrice[:, line])
-            paths.append(line)
+            line = np.nanargmin(self._matrice[:, line])
+            paths.append(int(line))
         paths.reverse()
         return paths
 
-    @property
     def maximiser(self):
         ligne = 0
         chemin = [ligne+1]
@@ -79,7 +77,7 @@ class Demoucron:
         return chemin
 
     def find_path(self) -> list[int]:
-        return getattr(self, self.choix)
+        return getattr(self, self.choix)()
 
     @staticmethod
     def notNan(a: np.float64):

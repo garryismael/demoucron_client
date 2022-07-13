@@ -20,30 +20,22 @@ app.add_middleware(
 
 
 class Matrice(BaseModel):
-    matrice: list[list[int | None]]
+    matrice: list[list[float | None]]
 
 
-def is_valid_matrice(matrice: Matrice, choice: str = Path(..., regex="^(minimiser|maximiser)$")):
-    line = len(matrice)
-    error = None
-    i = 0
-    for tab in matrice:
-        if len(tab) != line:
-            error = INVALID_MATRIX_UNITY
-        if choice == 'minimiser':
-            if tab[i] != None:
-                error = INVALID_MATRIX_VALUE
-        else:
-            if tab[i] != 0:
-                error = INVALID_MATRIX_VALUE
-        if error is not None:
-            raise HTTPException(status_code=400, detail=error)
-        i += 1
-    return matrice, choice
+def is_valid_matrice(data: Matrice, choice: str = Path(..., regex="^(minimiser|maximiser)$")):
+    line = len(data.matrice)
+    for i in range(line):
+        arr = data.matrice[i]
+        valid_min = choice == 'minimiser' and arr[i] == None
+        valid_max = choice == 'maximiser' and arr[i] == 0
+        if (len(arr) != line):
+            raise HTTPException(status_code=400, detail=INVALID_MATRIX_UNITY)
+        if valid_min or valid_max:
+            raise HTTPException(status_code=400, detail=INVALID_MATRIX_VALUE)
+    return Demoucron(np.array(data.matrice, dtype=np.float64), choix=choice)
 
 
 @app.post("/{choice}")
-def api(data: tuple[Matrice, str] = Depends(is_valid_matrice)):
-    matrice, choice = data
-    demoucron = Demoucron(np.array(matrice), choice)
+def api(demoucron: Demoucron = Depends(is_valid_matrice)):
     return demoucron.find_path()
