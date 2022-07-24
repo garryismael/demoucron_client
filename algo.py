@@ -76,7 +76,7 @@ class Demoucron:
                     break
         res.append(0)
         res.reverse()
-        print(res)
+        return res
 
     def find_path(self) -> list[int]:
         return getattr(self, self.choix)

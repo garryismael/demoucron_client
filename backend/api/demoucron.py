@@ -61,22 +61,21 @@ class Demoucron:
 
     @property
     def maximiser(self):
-        ligne = 0
-        chemin = [ligne+1]
-        while ligne < self.sommets - 1:
-            i = 0
-            min_value = self._matrice[ligne, i]
-            for item in self._matrice[ligne]:
-                if min_value > 0 and item > 0:
-                    if item < min_value:
-                        min_value = item
-                        ligne = i
-                elif min_value == 0 and item > 0:
-                    min_value = item
-                    ligne = i
-                i += 1
-            chemin.append(ligne+1)
-        return chemin
+        column = self.sommets-1
+        res = []
+        while column > 0:
+            marquages = np.amax(self._matrice, axis=0)
+            max_val = marquages[column]
+            distances = self._origin[:, column]
+            indices = [i for i, v in enumerate(distances) if v > 0]
+            for i in indices:
+                if distances[i] + marquages[i] == max_val:
+                    res.append(column)
+                    column = i
+                    break
+        res.append(0)
+        res.reverse()
+        return res
 
     def find_path(self) -> list[int]:
         return getattr(self, self.choix)
