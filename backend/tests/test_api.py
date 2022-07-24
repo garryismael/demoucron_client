@@ -1,11 +1,11 @@
 import unittest
 from fastapi.testclient import TestClient
 
-from api import app
+from api.main import app
 from constants import (
-    MATRICE_MAX, MATRICE_LENGTH_NOT_EQUAL,
+    MATRICE_LENGTH_NOT_EQUAL,
     MATRICE_MAX_INVALID, MATRICE_MIN, MATRICE_MIN_INVALID,
-    PATH_MAX, PATH_MIN, MATRICE, DETAIL, RESULTAT
+    PATH_MAX, PATH_MIN, MATRICE, DETAIL, RESULTAT,MAX_BIG_MATRIX
 )
 from api.constants import (
     INVALID_MATRIX_UNITY,
@@ -21,10 +21,10 @@ class ApiTestCase(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
 
-    def test_chemin_max(self):
-        response = self.client.post(PATH_MAX, json={MATRICE: MATRICE_MAX})
-        self.assertEqual(response.json()[RESULTAT], [1, 2, 4, 3, 5, 7])
-
+    def test_chemin_max_big_matrix(self):
+        response = self.client.post(PATH_MAX, json={MATRICE: MAX_BIG_MATRIX})
+        self.assertEqual(response.json()[RESULTAT], [0, 1, 3, 2, 10, 11, 14, 13, 16])
+        
     def test_invalid_matrice_max(self):
         response = self.client.post(
             PATH_MAX, json={MATRICE: MATRICE_MAX_INVALID})
