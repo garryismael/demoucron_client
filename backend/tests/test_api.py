@@ -1,5 +1,6 @@
 import unittest
 from fastapi.testclient import TestClient
+from fastapi import status
 
 from api.main import app
 from constants import (
@@ -28,7 +29,7 @@ class ApiTestCase(unittest.TestCase):
     def test_invalid_matrice_max(self):
         response = self.client.post(
             PATH_MAX, json={MATRICE: MATRICE_MAX_INVALID})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.json()[DETAIL], INVALID_MATRIX_VALUE)
 
     def test_chemin_min(self):
@@ -38,11 +39,11 @@ class ApiTestCase(unittest.TestCase):
     def test_invalid_matrice_min(self):
         response = self.client.post(
             PATH_MIN, json={MATRICE: MATRICE_MIN_INVALID})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         self.assertEqual(response.json()[DETAIL], INVALID_MATRIX_VALUE)
 
     def test_invalid_len_matrice(self):
         response = self.client.post(
             PATH_MIN, json={MATRICE: MATRICE_LENGTH_NOT_EQUAL})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.json()[DETAIL], INVALID_MATRIX_UNITY)

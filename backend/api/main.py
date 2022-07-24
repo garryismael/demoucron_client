@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, Path, HTTPException
+from fastapi import Depends, FastAPI, Path, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from pydantic import BaseModel
@@ -30,9 +30,9 @@ def is_valid_matrice(data: Matrice, choice: str = Path(..., regex="^(minimiser|m
         valid_min = choice == 'minimiser' and arr[i] == None
         valid_max = choice == 'maximiser' and arr[i] == 0
         if (len(arr) != line):
-            raise HTTPException(status_code=400, detail=INVALID_MATRIX_UNITY)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=INVALID_MATRIX_UNITY)
         if valid_min or valid_max:
-            raise HTTPException(status_code=400, detail=INVALID_MATRIX_VALUE)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=INVALID_MATRIX_VALUE)
     return Demoucron(np.array(data.matrice, dtype=np.float64), choix=choice)
 
 
